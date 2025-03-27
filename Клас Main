@@ -20,9 +20,11 @@ public class Main {
             System.out.print("Введіть номер уроку: ");
             int number = scanner.nextInt();
 
-            String building = null;
-            schedule.Lesson lesson = new schedule.Lesson(subject, new Teacher(teacherName, new Department("Example")), new Classroom(room, 30, null), day, number, LocalDate.now());
-            manager.addLesson();
+            schedule.Lesson lesson = new schedule.Lesson(subject,
+                    new Teacher(teacherName, new Department("Example")),
+                    new Classroom(room, 30, null), day, number, LocalDate.now());
+
+            manager.addLesson(lesson);
         } catch (Exception e) {
             e.printStackTrace();
         }
