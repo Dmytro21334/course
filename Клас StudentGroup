@@ -1,0 +1,30 @@
+package schedule;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class StudentGroup {
+    private final String groupName;
+    private final List<String> students;
+
+    public StudentGroup(String groupName) {
+        this.groupName = groupName;
+        this.students = new ArrayList<>();
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public List<String> getStudents() {
+        return students;
+    }
+
+    public void addStudent(String studentName) {
+        students.add(studentName);
+    }
+
+    public void removeStudent(String studentName) {
+        students.remove(studentName);
+    }
+}
