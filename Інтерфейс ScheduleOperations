@@ -1,0 +1,9 @@
+package schedule;
+
+public interface ScheduleOperations {
+    void addLesson(Lesson lesson);
+
+    void saveSchedule();
+
+    void loadSchedule();
+}
