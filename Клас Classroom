@@ -1,0 +1,19 @@
+package schedule;
+
+public class Classroom {
+    private final String roomNumber;
+    private final int capacity;
+
+    public Classroom(String roomNumber, int capacity, String building) {
+        this.roomNumber = roomNumber;
+        this.capacity = capacity;
+    }
+
+    public String getRoomNumber() {
+        return roomNumber;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+}
