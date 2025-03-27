@@ -1,0 +1,56 @@
+package schedule;
+
+import java.time.LocalDate;
+
+class Lesson {
+    private String subject;
+    private Teacher teacher;
+    private Classroom classroom;
+    private String dayOfWeek;
+    private int lessonNumber;
+    private LocalDate date;
+
+    public Lesson(String subject, Teacher teacher, Classroom classroom, String dayOfWeek, int lessonNumber, LocalDate date) {
+        this.subject = subject;
+        this.teacher = teacher;
+        this.classroom = classroom;
+        this.dayOfWeek = dayOfWeek;
+        this.lessonNumber = lessonNumber;
+        this.date = date;
+    }
+
+    public Lesson(String part, String part1, String part2, String part3, int lessonNumber, LocalDate date) {
+    }
+
+    public Lesson(String part, String part1, String part2, String part3, int parseInt) {
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public Classroom getClassroom() {
+        return classroom;
+    }
+
+    public String getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    public int getLessonNumber() {
+        return lessonNumber;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%-10s | %-15s | %-15s | %-10s | %-5d | %s", dayOfWeek, subject, teacher.getName(), classroom.getRoomNumber(), lessonNumber, date);
+    }
+}
