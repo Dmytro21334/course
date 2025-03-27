@@ -1,0 +1,19 @@
+package schedule;
+
+import java.util.List;
+import java.util.Map;
+
+public class SchedulePrinter {   
+
+    public static void printSchedule(Map<String, List<Lesson>> schedule, String day) {
+        if (schedule.containsKey(day)) {
+            System.out.printf("%-10s | %-15s | %-15s | %-10s | %-5s\n", "День", "Предмет", "Викладач", "Кабінет", "№");
+            System.out.println("---------------------------------------------------------");
+            schedule.get(day).stream()
+                    .forEach(l -> System.out.printf("%-10s | %-15s | %-15s | %-10s | %-5d\n",
+                            l.getDayOfWeek(), l.getSubject(), l.getTeacher(), l.getClassroom(), l.getLessonNumber()));
+        } else {
+            System.out.println("Розклад порожній на цей день.");
+        }
+    }
+}
