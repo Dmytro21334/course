@@ -1,0 +1,66 @@
+package schedule;
+
+import java.io.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+
+public class ScheduleManager implements schedule.ScheduleOperations {
+    private final Map<String, List<schedule.Lesson>> schedule;
+    private final String FILE_NAME = "schedule.txt";
+
+    public ScheduleManager() {
+        schedule = new HashMap<>();
+        loadSchedule();
+    }
+
+    @Override
+    public void addLesson(schedule.Lesson lesson) {
+        schedule.putIfAbsent(lesson.getDayOfWeek(), new ArrayList<>());
+        for (schedule.Lesson l : schedule.get(lesson.getDayOfWeek())) {
+            if (l.getLessonNumber() == lesson.getLessonNumber()) {
+                System.out.println("Конфлікт уроків! Урок не додано.");
+                return;
+            }
+        }
+        schedule.get(lesson.getDayOfWeek()).add(lesson);
+        saveSchedule();
+    }
+
+    public void saveSchedule() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
+            for (Map.Entry<String, List<Lesson>> entry : schedule.entrySet()) {
+                for (Lesson l : entry.getValue()) {
+                    writer.write(String.format("%s,%d,%s,%s,%s,%s\n", l.getDayOfWeek(), l.getLessonNumber(), l.getSubject(), l.getTeacher().getName(), l.getClassroom().getRoomNumber(), l.getDate().toString()));
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Помилка збереження файлу.");
+        }
+    }
+
+    @Override
+    public void loadSchedule() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 6) {
+                    try {
+                        LocalDate date = LocalDate.parse(parts[5]);
+                        String building = null;
+                        schedule.Lesson lesson = new schedule.Lesson(parts[2], new Teacher(parts[3], new Department("Example")), new Classroom(parts[4], 30, null), parts[0], Integer.parseInt(parts[1]), date);
+                        addLesson(lesson);
+                    } catch (DateTimeParseException e) {
+                        System.out.println("Помилка парсингу дати: " + parts[5]);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Файл розкладу не знайдено, створюється новий.");
+        }
+    }
+
+    public void addLesson() {
+    }
+}
