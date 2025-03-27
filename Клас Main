@@ -1,0 +1,30 @@
+package schedule;
+
+import java.time.LocalDate;
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        ScheduleManager manager = new ScheduleManager();
+
+        try {
+            System.out.print("Введіть предмет: ");
+            String subject = scanner.nextLine();
+            System.out.print("Введіть викладача: ");
+            String teacherName = scanner.nextLine();
+            System.out.print("Введіть кабінет: ");
+            String room = scanner.nextLine();
+            System.out.print("Введіть день тижня: ");
+            String day = scanner.nextLine();
+            System.out.print("Введіть номер уроку: ");
+            int number = scanner.nextInt();
+
+            String building = null;
+            schedule.Lesson lesson = new schedule.Lesson(subject, new Teacher(teacherName, new Department("Example")), new Classroom(room, 30, null), day, number, LocalDate.now());
+            manager.addLesson();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
