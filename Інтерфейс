@@ -1,0 +1,6 @@
+package schedule;
+
+public interface ScheduleDataOperations {
+    void saveSchedule(String filename);
+    void loadSchedule(String filename);
+}
