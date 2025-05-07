@@ -1,9 +1,24 @@
 package schedule;
 
+import java.util.List;
+import java.util.Map;
+
 public interface ScheduleOperations {
     void addLesson(Lesson lesson);
 
+    void updateLesson(Lesson lesson);
+
+    void displaySchedule(String day);
+
     void saveSchedule();
 
-    void loadSchedule();
+    void removeLesson(String dayOfWeek, int lessonNumber);
+
+    void displayLessonsByTeacher(Teacher teacher);
+
+    Map<Integer, Lesson> getLessonsForDay(String day);
+
+    void saveSchedule(String filename);
+
+    void loadSchedule(String filename);
 }
