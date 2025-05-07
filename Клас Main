@@ -1,32 +1,280 @@
 package schedule;
 
 import java.time.LocalDate;
-import java.util.Scanner;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
+        ScheduleManager scheduleManager = new ScheduleManager();
         Scanner scanner = new Scanner(System.in);
-        ScheduleManager manager = new ScheduleManager();
 
-        try {
-            System.out.print("Введіть предмет: ");
-            String subject = scanner.nextLine();
-            System.out.print("Введіть викладача: ");
-            String teacherName = scanner.nextLine();
-            System.out.print("Введіть кабінет: ");
-            String room = scanner.nextLine();
-            System.out.print("Введіть день тижня: ");
-            String day = scanner.nextLine();
-            System.out.print("Введіть номер уроку: ");
-            int number = scanner.nextInt();
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(300000);
+                    scheduleManager.saveToFile();
+                    System.out.println("Розклад автоматично збережено.");
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }).start();
 
-            schedule.Lesson lesson = new schedule.Lesson(subject,
-                    new Teacher(teacherName, new Department("Example")),
-                    new Classroom(room, 30, null), day, number, LocalDate.now());
+        while (true) {
+            System.out.println("\nМеню:");
+            System.out.println("1. Додати урок");
+            System.out.println("2. Змінити урок");
+            System.out.println("3. Видалити урок");
+            System.out.println("4. Переглянути розклад");
+            System.out.println("5. Пошук уроків за викладачем");
+            System.out.println("6. Пошук уроків за предметом");
+            System.out.println("7. Вийти");
+            System.out.print("Виберіть дію (1-7): ");
 
-            manager.addLesson(lesson);
-        } catch (Exception e) {
-            e.printStackTrace();
+            int choice = -1;
+
+            try {
+                choice = Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Будь ласка, введіть число від 1 до 7.");
+                continue;
+            }
+
+            switch (choice) {
+                case 1:
+                    Lesson addedLesson = addLessonMenu(scanner, scheduleManager);
+                    System.out.println("Урок додано: " + addedLesson);
+                    break;
+                case 2:
+                    updateLessonMenu(scanner, scheduleManager);
+                    break;
+                case 3:
+                    removeLessonMenu(scanner, scheduleManager);
+                    break;
+                case 4:
+                    viewScheduleMenu(scanner, scheduleManager);
+                    break;
+                case 5:
+                    searchLessonsByTeacher(scanner, scheduleManager);
+                    break;
+                case 6:
+                    searchLessonsBySubject(scanner, scheduleManager);
+                    break;
+                case 7:
+                    System.out.println("Дякуємо, що користувалися розкладом!");
+                    return;
+                default:
+                    System.out.println("Невірний вибір, спробуйте ще раз.");
+            }
         }
+    }
+
+    private static Lesson addLessonMenu(Scanner scanner, ScheduleManager scheduleManager) {
+
+        System.out.println("Введіть предмет:");
+        String subject = scanner.nextLine().trim();
+
+        System.out.println("Введіть викладача:");
+        String teacherName = scanner.nextLine().trim();
+        while (teacherName.isEmpty()) {
+            System.out.println("Ім'я викладача не може бути порожнім. Введіть викладача:");
+            teacherName = scanner.nextLine().trim();
+        }
+
+        System.out.println("Введіть тип аудиторії (стандартний, з проектором, з комп'ютерами, з проектором і комп'ютерами):");
+        String roomType = scanner.nextLine().trim();
+
+        System.out.println("Введіть номер кабінету:");
+        String classroom = scanner.nextLine().trim();
+
+        System.out.println("Введіть день тижня:");
+        String dayOfWeek = scanner.nextLine().trim();
+
+        int lessonNumber = -1;
+        while (lessonNumber < 1 || lessonNumber > 10) {
+            try {
+                System.out.println("Введіть номер уроку (від 1 до 10):");
+                lessonNumber = Integer.parseInt(scanner.nextLine().trim());
+                if (lessonNumber < 1 || lessonNumber > 10) {
+                    System.out.println("Номер уроку повинен бути між 1 та 10.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Введіть правильний номер уроку (ціле число від 1 до 10):");
+            }
+        }
+
+        System.out.println("Введіть дату уроку (формат: День Місяць Рік):");
+        String dateInput = scanner.nextLine().trim();
+        Map<String, String> monthMap = getStringStringMap();
+        for (Map.Entry<String, String> entry : monthMap.entrySet()) {
+            if (dateInput.contains(entry.getKey())) {
+                dateInput = dateInput.replace(entry.getKey(), entry.getValue());
+                break;
+            }
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+        LocalDate lessonDate = null;
+        boolean validDate = false;
+
+        while (!validDate) {
+            try {
+                lessonDate = LocalDate.parse(dateInput, formatter);
+                validDate = true;
+            } catch (Exception e) {
+                System.out.println("Помилка при введенні дати. Спробуйте ще раз.");
+                System.out.print("Введіть дату уроку (формат: День Місяць Рік): ");
+                dateInput = scanner.nextLine().trim();
+
+                for (Map.Entry<String, String> entry : monthMap.entrySet()) {
+                    if (dateInput.contains(entry.getKey())) {
+                        dateInput = dateInput.replace(entry.getKey(), entry.getValue());
+                        break;
+                    }
+                }
+            }
+        }
+
+        System.out.println("Введіть час початку заняття:");
+        String startTime = scanner.nextLine().trim();
+        System.out.println("Введіть час закінчення заняття:");
+        String endTime = scanner.nextLine().trim();
+
+        Teacher teacher = new Teacher(teacherName);
+        Classroom classroomObj = new Classroom(roomType, classroom);
+
+        Lesson lesson = new Lesson(subject, teacher, classroomObj, dayOfWeek, lessonNumber, lessonDate, startTime, endTime);
+
+        if (scheduleManager.checkForConflict(lesson)) {
+            System.out.println("Конфлікт уроку в цей час. Урок не додано.");
+        } else {
+            scheduleManager.addLesson(lesson);
+            System.out.println("Урок успішно додано!");
+        }
+
+        scheduleManager.saveToFile();
+
+        return lesson;
+    }
+
+
+    private static void updateLessonMenu(Scanner scanner, ScheduleManager scheduleManager) {
+        System.out.println("Введіть день тижня для зміни уроку:");
+        String day = scanner.nextLine();
+
+        System.out.println("Введіть номер уроку для зміни:");
+        int lessonNumber = Integer.parseInt(scanner.nextLine());
+
+        Map<Integer, Lesson> dayLessons = scheduleManager.getLessonsForDay(day);
+        Lesson existingLesson = dayLessons.get(lessonNumber);
+
+        if (existingLesson == null) {
+            System.out.println("Урок з таким номером не знайдений.");
+            return;
+        }
+
+        System.out.println("Знайдений урок: " + existingLesson);
+        System.out.println("Що саме ви хочете змінити?");
+        System.out.println("1. Предмет");
+        System.out.println("2. Викладача");
+        System.out.println("3. Тип аудиторії");
+        System.out.println("4. Номер уроку");
+        System.out.println("5. Вийти");
+
+        int choice = Integer.parseInt(scanner.nextLine());
+        switch (choice) {
+            case 1:
+                System.out.print("Введіть новий предмет: ");
+                String newSubject = scanner.nextLine();
+                existingLesson.setSubject(newSubject);
+                break;
+            case 2:
+                System.out.print("Введіть нового викладача: ");
+                String newTeacher = scanner.nextLine();
+                existingLesson.getTeacher().setName(newTeacher);
+                break;
+            case 3:
+                System.out.print("Введіть новий тип аудиторії: ");
+                String newRoomType = scanner.nextLine().strip();
+                String existingRoomNumber = existingLesson.getClassroom();
+                Classroom newClassroom = new Classroom(newRoomType, existingRoomNumber);
+                existingLesson.setClassroom(newClassroom.getClassroom());
+                break;
+            case 4:
+                System.out.print("Введіть новий номер уроку: ");
+                int newLessonNumber = Integer.parseInt(scanner.nextLine());
+                existingLesson.setLessonNumber(newLessonNumber);
+                break;
+            case 5:
+                return;
+            default:
+                System.out.println("Невірний вибір.");
+        }
+
+        scheduleManager.updateLesson(existingLesson);
+        System.out.println("Урок успішно оновлено!");
+    }
+
+    private static void removeLessonMenu(Scanner scanner, ScheduleManager scheduleManager) {
+        System.out.println("Введіть день тижня для видалення уроку:");
+        String day = scanner.nextLine();
+
+        System.out.println("Введіть номер уроку для видалення:");
+        int lessonNumber = Integer.parseInt(scanner.nextLine());
+
+        scheduleManager.removeLesson(day, lessonNumber);
+    }
+
+    private static void viewScheduleMenu(Scanner scanner, ScheduleManager scheduleManager) {
+        System.out.println("Введіть день тижня для перегляду розкладу:");
+        String day = scanner.nextLine();
+
+        scheduleManager.displaySchedule(day);
+    }
+
+    private static void searchLessonsBySubject(Scanner scanner, ScheduleManager scheduleManager) {
+        System.out.print("Введіть предмет для пошуку: ");
+        String subject = scanner.nextLine().trim();
+
+        List<Lesson> lessons = scheduleManager.findLessonsBySubject(subject);
+
+        if (lessons.isEmpty()) {
+            System.out.println("Уроки для цього предмета не знайдені.");
+        } else {
+            System.out.println("Уроки для предмета " + subject + ":");
+            lessons.forEach(System.out::println);
+        }
+    }
+
+    private static void searchLessonsByTeacher(Scanner scanner, ScheduleManager scheduleManager) {
+        System.out.print("Введіть ім'я викладача для пошуку: ");
+        String teacherName = scanner.nextLine();
+
+        List<Lesson> lessons = scheduleManager.findLessonsByTeacher(teacherName);
+
+        if (lessons.isEmpty()) {
+            System.out.println("Уроки для цього викладача не знайдені.");
+        } else {
+            System.out.println("Уроки для викладача " + teacherName + ":");
+            lessons.forEach(System.out::println);
+        }
+    }
+
+    private static Map<String, String> getStringStringMap() {
+        Map<String, String> monthMap = new HashMap<>();
+        monthMap.put("Січня", "January");
+        monthMap.put("Лютого", "February");
+        monthMap.put("Березня", "March");
+        monthMap.put("Квітня", "April");
+        monthMap.put("Травня", "May");
+        monthMap.put("Червня", "June");
+        monthMap.put("Липня", "July");
+        monthMap.put("Серпня", "August");
+        monthMap.put("Вересня", "September");
+        monthMap.put("Жовтня", "October");
+        monthMap.put("Листопада", "November");
+        monthMap.put("Грудня", "December");
+        return monthMap;
     }
 }
