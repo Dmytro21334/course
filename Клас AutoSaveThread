@@ -1,0 +1,23 @@
+package schedule;
+
+public class AutoSaveThread extends Thread {
+    private final ScheduleManager manager;
+
+    public AutoSaveThread(ScheduleManager manager) {
+        this.manager = manager;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                Thread.sleep(60000); // зберігати кожну хвилину
+                manager.saveToFile();
+                System.out.println("[AutoSave] Розклад збережено автоматично.");
+            } catch (InterruptedException e) {
+                System.out.println("[AutoSave] Потік автозбереження зупинено.");
+                break;
+            }
+        }
+    }
+}
