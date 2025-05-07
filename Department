@@ -1,13 +1,49 @@
 package schedule;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Department {
-    private String name;
+    private final String name;
+    private final List<Lesson> lessons;
+    private final List<Teacher> teachers;
 
     public Department(String name) {
         this.name = name;
+        this.lessons = new ArrayList<>();
+        this.teachers = new ArrayList<>();
     }
 
     public String getName() {
         return name;
+    }
+
+    public void addLesson(Lesson lesson) {
+        lessons.add(lesson);
+    }
+
+    public void removeLesson(Lesson lesson) {
+        lessons.remove(lesson);
+    }
+
+    public List<Lesson> getLessons() {
+        return lessons;
+    }
+
+    public void addTeacher(Teacher teacher) {
+        teachers.add(teacher);
+    }
+
+    public List<Teacher> getTeachers() {
+        return teachers;
+    }
+
+    @Override
+    public String toString() {
+        return "Department{" +
+                "name='" + name + '\'' +
+                ", lessons=" + lessons +
+                ", teachers=" + teachers +
+                '}';
     }
 }
