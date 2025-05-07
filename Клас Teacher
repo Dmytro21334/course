@@ -1,19 +1,27 @@
 package schedule;
 
-public class Teacher {
-    private final String name;
-    private final Department department;
+import java.io.Serial;
+import java.io.Serializable;
 
-    public Teacher(String name, Department department) {
+public class Teacher implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private String name;
+
+    public Teacher(String name) {
         this.name = name;
-        this.department = department;
     }
 
     public String getName() {
         return name;
     }
 
-    public Department getDepartment() {
-        return department;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
