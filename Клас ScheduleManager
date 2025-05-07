@@ -1,66 +1,136 @@
 package schedule;
 
-import java.io.*;
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class ScheduleManager implements schedule.ScheduleOperations {
-    private final Map<String, List<schedule.Lesson>> schedule;
-    private final String FILE_NAME = "schedule.txt";
+public class ScheduleManager implements ScheduleOperations, ScheduleDataOperations {
+    private final Map<String, Map<Integer, Lesson>> lessons = new HashMap<>();
+    private final Map<String, List<Lesson>> teacherLessons = new HashMap<>();
 
-    public ScheduleManager() {
-        schedule = new HashMap<>();
-        loadSchedule();
+    @Override
+    public void addLesson(Lesson lesson) {
+        Map<Integer, Lesson> dayLessons = lessons.computeIfAbsent(lesson.getDayOfWeek(), k -> new HashMap<>());
+        if (dayLessons.containsKey(lesson.getLessonNumber())) {
+            System.out.println("Конфлікт: Урок з таким номером вже існує.");
+            return;
+        }
+        dayLessons.put(lesson.getLessonNumber(), lesson);
+        if (lesson.getTeacher() != null) {
+            teacherLessons.computeIfAbsent(lesson.getTeacher().getName(), k -> new ArrayList<>()).add(lesson);
+        } else {
+            System.out.println("Помилка: об'єкт Teacher є null.");
+        }
     }
 
     @Override
-    public void addLesson(schedule.Lesson lesson) {
-        schedule.putIfAbsent(lesson.getDayOfWeek(), new ArrayList<>());
-        for (schedule.Lesson l : schedule.get(lesson.getDayOfWeek())) {
-            if (l.getLessonNumber() == lesson.getLessonNumber()) {
-                System.out.println("Конфлікт уроків! Урок не додано.");
-                return;
-            }
+    public void removeLesson(String dayOfWeek, int lessonNumber) {
+        Map<Integer, Lesson> dayLessons = lessons.get(dayOfWeek);
+        if (dayLessons != null && dayLessons.containsKey(lessonNumber)) {
+            Lesson lessonToRemove = dayLessons.remove(lessonNumber);
+            teacherLessons.get(lessonToRemove.getTeacher().getName()).remove(lessonToRemove);
+            System.out.println("Урок видалено: " + lessonToRemove);
+        } else {
+            System.out.println("Урок не знайдено для видалення.");
         }
-        schedule.get(lesson.getDayOfWeek()).add(lesson);
-        saveSchedule();
     }
 
+    @Override
+    public void updateLesson(Lesson lesson) {
+        if (checkForConflict(lesson)) {
+            System.out.println("Урок з таким номером вже існує на цей день.");
+            return;
+        }
+
+        Map<Integer, Lesson> dayLessons = lessons.get(lesson.getDayOfWeek());
+        if (dayLessons != null && dayLessons.containsKey(lesson.getLessonNumber())) {
+            Lesson oldLesson = dayLessons.get(lesson.getLessonNumber());
+
+            dayLessons.put(lesson.getLessonNumber(), lesson);
+            System.out.println("Урок оновлено: " + lesson);
+
+            if (oldLesson.getTeacher() != null) {
+                List<Lesson> oldList = teacherLessons.get(oldLesson.getTeacher().getName());
+                if (oldList != null) oldList.remove(oldLesson);
+            }
+
+            if (lesson.getTeacher() != null) {
+                teacherLessons.computeIfAbsent(lesson.getTeacher().getName(), k -> new ArrayList<>()).add(lesson);
+            }
+
+        } else {
+            System.out.println("Урок не знайдено для оновлення.");
+        }
+    }
+
+    @Override
+    public void displaySchedule(String dayOfWeek) {
+        Map<Integer, Lesson> dayLessons = lessons.getOrDefault(dayOfWeek, new HashMap<>());
+        if (dayLessons.isEmpty()) {
+            System.out.println("Немає уроків на " + dayOfWeek);
+        } else {
+            System.out.println("Розклад на " + dayOfWeek + ":");
+            dayLessons.values().stream().sorted(Comparator.comparingInt(Lesson::getLessonNumber)).forEach(System.out::println);
+        }
+    }
+
+    @Override
     public void saveSchedule() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
-            for (Map.Entry<String, List<Lesson>> entry : schedule.entrySet()) {
-                for (Lesson l : entry.getValue()) {
-                    writer.write(String.format("%s,%d,%s,%s,%s,%s\n", l.getDayOfWeek(), l.getLessonNumber(), l.getSubject(), l.getTeacher().getName(), l.getClassroom().getRoomNumber(), l.getDate().toString()));
-                }
-            }
+    }
+
+    @Override
+    public void saveSchedule(String filename) {
+        FileDataManager fileDataManager = new FileDataManager(filename);
+        fileDataManager.saveData(lessons);
+        System.out.println("Розклад збережено в файл " + filename);
+    }
+
+    @Override
+    public void loadSchedule(String filename) {
+        FileDataManager fileDataManager = new FileDataManager(filename);
+        lessons.putAll(fileDataManager.loadData());
+        System.out.println("Розклад завантажено з файлу " + filename);
+    }
+
+    @Override
+    public void displayLessonsByTeacher(Teacher teacher) {
+        List<Lesson> lessons = teacherLessons.get(teacher.getName());
+        if (lessons == null || lessons.isEmpty()) {
+            System.out.println("Немає уроків для " + teacher.getName());
+        } else {
+            System.out.println("Уроки для " + teacher.getName() + ":");
+            lessons.forEach(System.out::println);
+        }
+    }
+
+    public boolean checkForConflict(Lesson lesson) {
+        Map<Integer, Lesson> dayLessons = getLessonsForDay(lesson.getDayOfWeek());
+        return dayLessons.containsKey(lesson.getLessonNumber());
+    }
+
+    public void saveToFile() {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("schedule.dat"))) {
+            out.writeObject(this.lessons);
         } catch (IOException e) {
-            System.out.println("Помилка збереження файлу.");
+            System.out.println("Помилка при збереженні даних: " + e.getMessage());
         }
     }
 
     @Override
-    public void loadSchedule() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 6) {
-                    try {
-                        LocalDate date = LocalDate.parse(parts[5]);
-                        String building = null;
-                        schedule.Lesson lesson = new schedule.Lesson(parts[2], new Teacher(parts[3], new Department("Example")), new Classroom(parts[4], 30, null), parts[0], Integer.parseInt(parts[1]), date);
-                        addLesson(lesson);
-                    } catch (DateTimeParseException e) {
-                        System.out.println("Помилка парсингу дати: " + parts[5]);
-                    }
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Файл розкладу не знайдено, створюється новий.");
-        }
+    public Map<Integer, Lesson> getLessonsForDay(String day) {
+        return lessons.getOrDefault(day, new HashMap<>());
     }
 
-    public void addLesson() {
+    public List<Lesson> findLessonsByTeacher(String teacherName) {
+        return teacherLessons.getOrDefault(teacherName, new ArrayList<>());
+    }
+
+    public List<Lesson> findLessonsBySubject(String subject) {
+        return lessons.values().stream()
+                .flatMap(dayLessons -> dayLessons.values().stream())
+                .filter(lesson -> lesson.getSubject().equals(subject))
+                .collect(Collectors.toList());
     }
 }
