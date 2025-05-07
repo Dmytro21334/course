@@ -1,19 +1,38 @@
 package schedule;
 
-public class Classroom {
-    private final String roomNumber;
-    private final int capacity;
+import java.io.Serial;
+import java.io.Serializable;
 
-    public Classroom(String roomNumber, int capacity, String building) {
-        this.roomNumber = roomNumber;
-        this.capacity = capacity;
+public class Classroom implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private String roomType;
+    private String classroom;
+
+    public Classroom(String roomType, String classroom) {
+        this.roomType = roomType;
+        this.classroom = classroom;
     }
 
-    public String getRoomNumber() {
-        return roomNumber;
+    public String getRoomType() {
+        return roomType;
     }
 
-    public int getCapacity() {
-        return capacity;
+    public void setRoomType(String roomType) {
+        this.roomType = roomType;
+    }
+
+    public String getClassroom() {
+        return classroom;
+    }
+
+    public void setClassroom(String classroom) {
+        this.classroom = classroom;
+    }
+
+    @Override
+    public String toString() {
+        return "Тип: " + roomType + ", Кабінет: " + classroom;
     }
 }
