@@ -1,23 +1,33 @@
 package schedule;
 
 public class Auditory extends Classroom {
-    private boolean hasProjector;
+    private static final byte[] roomNumber = new byte[0];
+    private final boolean hasProjector;
+    private final boolean hasComputers;
 
-    public Auditory(String roomNumber, int capacity, String building, boolean hasProjector) {
-        super(roomNumber, capacity, building);
+    public Auditory(String roomType, String roomNumber, boolean hasProjector, boolean hasComputers) {
+        super(roomType, roomNumber);
         this.hasProjector = hasProjector;
+        this.hasComputers = hasComputers;
+    }
+
+    private static String roomNumber() {
+        return "";
     }
 
     public boolean hasProjector() {
         return hasProjector;
     }
 
-    public void setHasProjector(boolean hasProjector) {
-        this.hasProjector = hasProjector;
+    public boolean hasComputers() {
+        return hasComputers;
     }
 
     @Override
     public String toString() {
-        return super.toString() + ", Проектор: " + (hasProjector ? "Так" : "Ні");
+        String result = super.toString();
+        if (hasProjector) result += " (з проектором)";
+        if (hasComputers) result += " (з комп'ютерами)";
+        return result;
     }
 }
