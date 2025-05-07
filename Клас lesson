@@ -1,40 +1,46 @@
 package schedule;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDate;
 
-class Lesson {
+public class Lesson implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private String classroom;
+    private LocalDate date;
+    private int lessonNumber;
     private String subject;
     private Teacher teacher;
-    private Classroom classroom;
     private String dayOfWeek;
-    private int lessonNumber;
-    private LocalDate date;
+    private String startTime;
+    private String endTime;
 
-    public Lesson(String subject, Teacher teacher, Classroom classroom, String dayOfWeek, int lessonNumber, LocalDate date) {
+    public Lesson(String subject, Teacher teacher, Classroom classroom, String dayOfWeek, int lessonNumber, LocalDate date, String startTime, String endTime) {
         this.subject = subject;
         this.teacher = teacher;
-        this.classroom = classroom;
+        this.classroom = String.valueOf(classroom);
         this.dayOfWeek = dayOfWeek;
         this.lessonNumber = lessonNumber;
         this.date = date;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
-    public Lesson(String part, String part1, String part2, String part3, int lessonNumber, LocalDate date) {
-    }
-
-    public Lesson(String part, String part1, String part2, String part3, int parseInt) {
+    public Lesson(String part, Teacher teacher, Classroom classroom, String part1, int i, Object o, String startTime, String endTime) {
     }
 
     public String getSubject() {
         return subject;
     }
 
-    public Teacher getTeacher() {
-        return teacher;
+    public String getClassroom() {
+        return classroom;
     }
 
-    public Classroom getClassroom() {
-        return classroom;
+    public Teacher getTeacher() {
+        return teacher;
     }
 
     public String getDayOfWeek() {
@@ -49,8 +55,50 @@ class Lesson {
         return date;
     }
 
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
+    }
+
+    public void setClassroom(String classroom) {
+        this.classroom = classroom;
+    }
+
+    public void setDayOfWeek(String dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
+    }
+
+    public void setLessonNumber(int lessonNumber) {
+        this.lessonNumber = lessonNumber;
+    }
+
+    public void setLessonDate(LocalDate newLessonDate) {
+        this.date = newLessonDate;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
     @Override
     public String toString() {
-        return String.format("%-10s | %-15s | %-15s | %-10s | %-5d | %s", dayOfWeek, subject, teacher.getName(), classroom.getRoomNumber(), lessonNumber, date);
+        return "Lesson{subject='" + subject + "', teacher=" + teacher + ", classroom=" + classroom +
+                ", dayOfWeek='" + dayOfWeek + "', lessonNumber=" + lessonNumber + ", lessonDate='" + date +
+                "', startTime='" + startTime + "', endTime='" + endTime + "'}";
     }
 }
