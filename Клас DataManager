@@ -1,40 +1,47 @@
-class DataManager implements FileDataManager {
+package schedule;
+
+import java.io.*;
+import java.util.*;
+
+class DataManager extends FileDataManager {
 
     private final String fileName;
 
     public DataManager(String fileName) {
+        super(fileName);
         this.fileName = fileName;
     }
 
     @Override
-    public void saveData(Map<String, List<schedule.Lesson>> schedule) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            for (Map.Entry<String, List<schedule.Lesson>> entry : schedule.entrySet()) {
-                for (schedule.Lesson l : entry.getValue()) {
-                    writer.write(l.getDayOfWeek() + "," + l.getLessonNumber() + "," + l.getSubject() + "," + l.getTeacher() + "," + l.getClassroom() + "\n");
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Помилка збереження файлу.");
-        }
-    }
+    public Map<String, Map<Integer, Lesson>> loadData() {
+        Map<String, Map<Integer, Lesson>> schedule = new HashMap<>();
 
-    @Override
-    public Map<String, List<schedule.Lesson>> loadData() {
-        Map<String, List<schedule.Lesson>> schedule = new HashMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length == 5) {
-                    schedule.Lesson lesson = new schedule.Lesson(parts[2], parts[3], parts[4], parts[0], Integer.parseInt(parts[1]));
-                    schedule.putIfAbsent(lesson.getDayOfWeek(), new ArrayList<>());
-                    schedule.get(lesson.getDayOfWeek()).add(lesson);
+                if (parts.length == 7) {
+                    Lesson lesson = getLesson(parts);
+                    schedule.putIfAbsent(lesson.getDayOfWeek(), new HashMap<>());
+                    schedule.get(lesson.getDayOfWeek()).put(lesson.getLessonNumber(), lesson);
                 }
             }
         } catch (IOException e) {
             System.out.println("Файл розкладу не знайдено, створюється новий.");
         }
+
         return schedule;
+    }
+
+    private static Lesson getLesson(String[] parts) {
+        String[] classroomParts = parts[4].split(" ");
+        String roomType = classroomParts[0];
+        String roomNumber = classroomParts.length > 1 ? classroomParts[1] : "";
+        String startTime = parts[5];
+        String endTime = parts[6];
+
+        Classroom classroom = new Classroom(roomType, roomNumber);
+        return new Lesson(parts[2], new Teacher(parts[3]), classroom, parts[0],
+                Integer.parseInt(parts[1]), null, startTime, endTime);
     }
 }
