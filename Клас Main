@@ -180,7 +180,8 @@ public class Main {
         System.out.println("2. Викладача");
         System.out.println("3. Тип аудиторії");
         System.out.println("4. Номер уроку");
-        System.out.println("5. Вийти");
+        System.out.println("5. Номер кабінету");
+        System.out.println("6. Вийти");
 
         int choice = Integer.parseInt(scanner.nextLine());
         switch (choice) {
@@ -197,9 +198,8 @@ public class Main {
             case 3:
                 System.out.print("Введіть новий тип аудиторії: ");
                 String newRoomType = scanner.nextLine().strip();
-                String existingRoomNumber = existingLesson.getClassroom();
-                Classroom newClassroom = new Classroom(newRoomType, existingRoomNumber);
-                existingLesson.setClassroom(newClassroom.getClassroom());
+                Classroom current = existingLesson.getClassroom();
+                existingLesson.setClassroom(new Classroom(newRoomType, current.getClassroom()));
                 break;
             case 4:
                 System.out.print("Введіть новий номер уроку: ");
@@ -207,10 +207,17 @@ public class Main {
                 existingLesson.setLessonNumber(newLessonNumber);
                 break;
             case 5:
+                System.out.print("Введіть новий номер кабінету: ");
+                String newRoomNumber = scanner.nextLine().strip();
+                Classroom currentClassroom = existingLesson.getClassroom();
+                existingLesson.setClassroom(new Classroom(currentClassroom.getType(), newRoomNumber));
+                break;
+            case 6:
                 return;
             default:
                 System.out.println("Невірний вибір.");
         }
+
 
         scheduleManager.updateLesson(existingLesson);
         System.out.println("Урок успішно оновлено!");
