@@ -8,19 +8,20 @@ public class Lesson implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String classroom;
-    private LocalDate date;
-    private int lessonNumber;
     private String subject;
     private Teacher teacher;
+    private Classroom classroom;
     private String dayOfWeek;
+    private int lessonNumber;
+    private LocalDate date;
     private String startTime;
     private String endTime;
 
-    public Lesson(String subject, Teacher teacher, Classroom classroom, String dayOfWeek, int lessonNumber, LocalDate date, String startTime, String endTime) {
+    public Lesson(String subject, Teacher teacher, Classroom classroom, String dayOfWeek, int lessonNumber,
+                  LocalDate date, String startTime, String endTime) {
         this.subject = subject;
         this.teacher = teacher;
-        this.classroom = String.valueOf(classroom);
+        this.classroom = classroom;
         this.dayOfWeek = dayOfWeek;
         this.lessonNumber = lessonNumber;
         this.date = date;
@@ -28,55 +29,52 @@ public class Lesson implements Serializable {
         this.endTime = endTime;
     }
 
-    public Lesson(String part, Teacher teacher, Classroom classroom, String part1, int i, Object o, String startTime, String endTime) {
-    }
-
     public String getSubject() {
         return subject;
-    }
-
-    public String getClassroom() {
-        return classroom;
-    }
-
-    public Teacher getTeacher() {
-        return teacher;
-    }
-
-    public String getDayOfWeek() {
-        return dayOfWeek;
-    }
-
-    public int getLessonNumber() {
-        return lessonNumber;
-    }
-
-    public LocalDate getDate() {
-        return date;
     }
 
     public void setSubject(String subject) {
         this.subject = subject;
     }
 
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
     public void setTeacher(Teacher teacher) {
         this.teacher = teacher;
     }
 
-    public void setClassroom(String classroom) {
+    public Classroom getClassroom() {
+        return classroom;
+    }
+
+    public void setClassroom(Classroom classroom) {
         this.classroom = classroom;
+    }
+
+    public String getDayOfWeek() {
+        return dayOfWeek;
     }
 
     public void setDayOfWeek(String dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
     }
 
+    public int getLessonNumber() {
+        return lessonNumber;
+    }
+
     public void setLessonNumber(int lessonNumber) {
         this.lessonNumber = lessonNumber;
     }
 
-    public void setLessonDate(LocalDate newLessonDate) {
-        this.date = newLessonDate;
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public String getStartTime() {
@@ -97,8 +95,15 @@ public class Lesson implements Serializable {
 
     @Override
     public String toString() {
-        return "Lesson{subject='" + subject + "', teacher=" + teacher + ", classroom=" + classroom +
-                ", dayOfWeek='" + dayOfWeek + "', lessonNumber=" + lessonNumber + ", lessonDate='" + date +
-                "', startTime='" + startTime + "', endTime='" + endTime + "'}";
+        return "Lesson{" +
+                "subject='" + subject + '\'' +
+                ", teacher=" + teacher +
+                ", classroom=" + classroom +
+                ", dayOfWeek='" + dayOfWeek + '\'' +
+                ", lessonNumber=" + lessonNumber +
+                ", date=" + date +
+                ", startTime='" + startTime + '\'' +
+                ", endTime='" + endTime + '\'' +
+                '}';
     }
 }
