@@ -35,4 +35,12 @@ public class Classroom implements Serializable {
     public String toString() {
         return "Тип: " + roomType + ", Кабінет: " + classroom;
     }
+
+    public String getType() {
+        return "";
+    }
+
+    public long[] getBytes() {
+        return new long[0];
+    }
 }
