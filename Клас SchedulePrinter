@@ -1,20 +1,26 @@
 package schedule;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class SchedulePrinter {
 
-    public static void printSchedule(Map<String, List<Lesson>> schedule, String day) {
-        if (schedule.containsKey(day)) {
-            System.out.printf("%-10s | %-15s | %-15s | %-10s | %-5s\n", "День", "Предмет", "Викладач", "Кабінет", "№");
-            System.out.println("---------------------------------------------------------");
-            schedule.get(day)
-                    .forEach(l -> System.out.printf("%-10s | %-15s | %-15s | %-10s | %-5d\n",
-                            l.getDayOfWeek(), l.getSubject(), l.getTeacher().getName(),
-                            l.getClassroom().getClassroom(), l.getLessonNumber()));
-        } else {
-            System.out.println("Розклад порожній на цей день.");
+    public static void printSchedule(Map<String, List<Lesson>> lessons, String dayOfWeek) {
+        System.out.printf("%-12s | %-15s | %-15s | %-10s | %-5s | %-11s%n",
+                "День", "Предмет", "Викладач", "Кабінет", "№", "Час");
+        System.out.println("------------------------------------------------------------------------------------");
+        List<Lesson> dayLessons = lessons.getOrDefault(dayOfWeek, new ArrayList<>());
+        for (Lesson lesson : dayLessons) {
+            System.out.printf("%-12s | %-15s | %-15s | %-10s | %-5d | %s - %s%n",
+                    lesson.getDayOfWeek(),
+                    lesson.getSubject(),
+                    lesson.getTeacher(),
+                    lesson.getClassroom().getRoomType(),
+                    lesson.getLessonNumber(),
+                    lesson.getStartTime(),
+                    lesson.getEndTime()
+            );
         }
     }
 }
