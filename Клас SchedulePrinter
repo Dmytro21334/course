@@ -9,7 +9,7 @@ public class SchedulePrinter {
     public static void printSchedule(Map<String, List<Lesson>> lessons, String dayOfWeek) {
         System.out.printf("%-12s | %-15s | %-15s | %-10s | %-5s | %-11s%n",
                 "День", "Предмет", "Викладач", "Кабінет", "№", "Час");
-        System.out.println("------------------------------------------------------------------------------------");
+        System.out.println("--------------------------------------------------------------------------------------");
         List<Lesson> dayLessons = lessons.getOrDefault(dayOfWeek, new ArrayList<>());
         for (Lesson lesson : dayLessons) {
             System.out.printf("%-12s | %-15s | %-15s | %-10s | %-5d | %s - %s%n",
