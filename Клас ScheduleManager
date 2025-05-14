@@ -3,6 +3,7 @@ package schedule;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -72,8 +73,35 @@ public class ScheduleManager implements ScheduleOperations, ScheduleDataOperatio
         if (dayLessons.isEmpty()) {
             System.out.println("Немає уроків на " + dayOfWeek);
         } else {
-            System.out.println("Розклад на " + dayOfWeek + ":");
-            dayLessons.values().stream().sorted(Comparator.comparingInt(Lesson::getLessonNumber)).forEach(System.out::println);
+            List<Lesson> lessonsList = dayLessons.values().stream()
+                    .sorted(Comparator.comparingInt(Lesson::getLessonNumber))
+                    .collect(Collectors.toList());
+
+            Map<String, List<Lesson>> fakeMap = new HashMap<>();
+            fakeMap.put(dayOfWeek, lessonsList);
+
+            SchedulePrinter.printSchedule(fakeMap, dayOfWeek);
+        }
+    }
+
+    @Override
+    public void displayScheduleForDate(LocalDate date) {
+        List<Lesson> allLessons = lessons.values().stream()
+                .flatMap(dayMap -> dayMap.values().stream())
+                .toList();
+
+        List<Lesson> lessonsForDate = allLessons.stream()
+                .filter(lesson -> lesson.getDate().equals(date))
+                .sorted(Comparator.comparingInt(Lesson::getLessonNumber))
+                .toList();
+
+        if (lessonsForDate.isEmpty()) {
+            System.out.println("Уроків на дату " + date + " не знайдено.");
+        } else {
+            System.out.println("Розклад на " + date + ":");
+            for (Lesson lesson : lessonsForDate) {
+                System.out.println(lesson);
+            }
         }
     }
 
