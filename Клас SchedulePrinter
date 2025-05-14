@@ -12,14 +12,9 @@ public class SchedulePrinter {
             schedule.get(day)
                     .forEach(l -> System.out.printf("%-10s | %-15s | %-15s | %-10s | %-5d\n",
                             l.getDayOfWeek(), l.getSubject(), l.getTeacher().getName(),
-                            Arrays.toString(l.getClassroom().getBytes()), l.getLessonNumber()));
+                            l.getClassroom().getClassroom(), l.getLessonNumber()));
         } else {
             System.out.println("Розклад порожній на цей день.");
         }
-    }
-
-    public static interface ScheduleDataOperations {
-        void saveSchedule(String filename);
-        void loadSchedule(String filename);
     }
 }
