@@ -234,10 +234,40 @@ public class Main {
     }
 
     private static void viewScheduleMenu(Scanner scanner, ScheduleManager scheduleManager) {
-        System.out.println("Введіть день тижня для перегляду розкладу:");
-        String day = scanner.nextLine();
+        System.out.println("Як ви хочете переглянути розклад?");
+        System.out.println("1. За днем тижня");
+        System.out.println("2. За точною датою (формат: День Місяць Рік)");
+        System.out.print("Ваш вибір: ");
+        String choice = scanner.nextLine().trim();
 
-        scheduleManager.displaySchedule(day);
+        switch (choice) {
+            case "1":
+                System.out.print("Введіть день тижня: ");
+                String day = scanner.nextLine().trim();
+                scheduleManager.displaySchedule(day);
+                break;
+            case "2":
+                System.out.print("Введіть дату (наприклад: 14 Травня 2025): ");
+                String dateInput = scanner.nextLine().trim();
+                Map<String, String> monthMap = getStringStringMap();
+                for (Map.Entry<String, String> entry : monthMap.entrySet()) {
+                    if (dateInput.contains(entry.getKey())) {
+                        dateInput = dateInput.replace(entry.getKey(), entry.getValue());
+                        break;
+                    }
+                }
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+                try {
+                    LocalDate date = LocalDate.parse(dateInput, formatter);
+                    scheduleManager.displayScheduleForDate(date);
+                } catch (Exception e) {
+                    System.out.println("Невірний формат дати. Спробуйте ще раз.");
+                }
+                break;
+            default:
+                System.out.println("Невірний вибір.");
+        }
     }
 
     private static void searchLessonsBySubject(Scanner scanner, ScheduleManager scheduleManager) {
