@@ -11,11 +11,11 @@ public class ScheduleManager implements ScheduleOperations, ScheduleDataOperatio
     private final Map<String, List<Lesson>> teacherLessons = new HashMap<>();
 
     @Override
-    public void addLesson(Lesson lesson) {
+    public boolean addLesson(Lesson lesson) {
         Map<Integer, Lesson> dayLessons = lessons.computeIfAbsent(lesson.getDayOfWeek(), k -> new HashMap<>());
         if (dayLessons.containsKey(lesson.getLessonNumber())) {
             System.out.println("Конфлікт: Урок з таким номером вже існує.");
-            return;
+            return false;
         }
         dayLessons.put(lesson.getLessonNumber(), lesson);
         if (lesson.getTeacher() != null) {
@@ -23,6 +23,7 @@ public class ScheduleManager implements ScheduleOperations, ScheduleDataOperatio
         } else {
             System.out.println("Помилка: об'єкт Teacher є null.");
         }
+        return true;
     }
 
     @Override
