@@ -98,10 +98,12 @@ public class ScheduleManager implements ScheduleOperations, ScheduleDataOperatio
         if (lessonsForDate.isEmpty()) {
             System.out.println("Уроків на дату " + date + " не знайдено.");
         } else {
+            Map<String, List<Lesson>> dailyMap = new HashMap<>();
+            String dayOfWeek = date.getDayOfWeek().toString();
+            dailyMap.put(dayOfWeek, lessonsForDate);
+
             System.out.println("Розклад на " + date + ":");
-            for (Lesson lesson : lessonsForDate) {
-                System.out.println(lesson);
-            }
+            SchedulePrinter.printSchedule(dailyMap, dayOfWeek);
         }
     }
 
