@@ -2,16 +2,19 @@ package schedule;
 
 public class AutoSaveThread extends Thread {
     private final ScheduleManager manager;
+    private final long interval;
 
-    public AutoSaveThread(ScheduleManager manager) {
+    public AutoSaveThread(ScheduleManager manager, long intervalMillis) {
         this.manager = manager;
+        this.interval = intervalMillis;
+        setDaemon(true);
     }
 
     @Override
     public void run() {
-        while (true) {
+        while (!isInterrupted()) {
             try {
-                Thread.sleep(60000); // зберігати кожну хвилину
+                Thread.sleep(interval);
                 manager.saveToFile();
                 System.out.println("[AutoSave] Розклад збережено автоматично.");
             } catch (InterruptedException e) {
