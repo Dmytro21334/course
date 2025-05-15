@@ -9,17 +9,8 @@ public class Main {
         ScheduleManager scheduleManager = new ScheduleManager();
         Scanner scanner = new Scanner(System.in);
 
-        new Thread(() -> {
-            while (true) {
-                try {
-                    Thread.sleep(300000);
-                    scheduleManager.saveToFile();
-                    System.out.println("Розклад автоматично збережено.");
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }).start();
+        AutoSaveThread autoSaveThread = new AutoSaveThread(scheduleManager, 300_000);
+        autoSaveThread.start();
 
         while (true) {
             System.out.println("\nМеню:");
