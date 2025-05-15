@@ -35,7 +35,6 @@ public class FileDataManager {
             String line;
             while ((line = reader.readLine()) != null) {
                 Lesson lesson = parseLessonFromString(line);
-                addGroupLesson(lesson.getSubject(), lesson);
             }
         } catch (IOException e) {
             System.err.println("Помилка при завантаженні даних: " + e.getMessage());
@@ -56,27 +55,6 @@ public class FileDataManager {
 
         Classroom classroom = new Classroom("стандартний", roomNumber);
         return new Lesson(subject, new Teacher(teacherName), classroom, dayOfWeek, lessonNumber, null, startTime, endTime);
-    }
-
-    public void addGroupLesson(String groupName, Lesson lesson) {
-        groupLessons.computeIfAbsent(groupName, k -> new HashMap<>())
-                .computeIfAbsent(lesson.getDayOfWeek(), k -> new ArrayList<>())
-                .add(lesson);
-    }
-
-    public void displayGroupSchedule(String groupName) {
-        if (!groupLessons.containsKey(groupName)) {
-            System.out.println("Група не знайдена.");
-            return;
-        }
-
-        Map<String, List<Lesson>> groupSchedule = groupLessons.get(groupName);
-        for (Map.Entry<String, List<Lesson>> entry : groupSchedule.entrySet()) {
-            System.out.println("День: " + entry.getKey());
-            for (Lesson lesson : entry.getValue()) {
-                System.out.println(lesson);
-            }
-        }
     }
 
     private String formatLessonToString(Lesson lesson) {
