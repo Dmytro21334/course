@@ -16,7 +16,7 @@ public class SchedulePrinter {
                     lesson.getDayOfWeek(),
                     lesson.getSubject(),
                     lesson.getTeacher(),
-                    lesson.getClassroom().toString(),
+                    lesson.getClassroom().getClassroom(),
                     lesson.getLessonNumber(),
                     lesson.getStartTime(),
                     lesson.getEndTime()
